@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VegCart - Fresh Vegetables & Fruits Delivery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-text">VegCart</div>
+            <div class="loading-subtext">Loading Fresh Vegetables & Fruits...</div>
+            <div class="loading-spinner"></div>
+            <div class="loading-progress">
+                <div class="loading-progress-fill" id="loading-progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connection Overlay (NEW) -->
+    <div class="connection-overlay" id="connection-overlay">
+        <div class="connection-icon">
+            <i class="fas fa-wifi-slash"></i>
+        </div>
+        <div class="connection-message">No Internet Connection</div>
+        <div class="connection-submessage">Please check your internet connection and try again. Your shopping cart will be saved.</div>
+    </div>
+
+    <!-- Processing Screen -->
+    <div class="processing-screen" id="processing-screen">
+        <div class="processing-content">
+            <div class="processing-icon">
+                <i class="fas fa-sync-alt"></i>
+            </div>
+            <div class="processing-text">Processing Your Order</div>
+            <div class="processing-subtext">Please wait while we confirm your order...</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Stock Update Indicator -->
+    <div class="stock-update-indicator" id="stock-update-indicator">
+        <i class="fas fa-sync-alt"></i>
+        <span>Stock Updated</span>
+    </div>
+
+    <!-- Auto Update Indicator -->
+    <div class="auto-update-indicator" id="auto-update-indicator">
+        <i class="fas fa-sync-alt"></i>
+        <span>Products Updated</span>
+    </div>
+
+    <!-- Stock Alert Modal -->
+    <div class="stock-alert" id="stock-alert">
+        <div class="warning-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3>Some Items Unavailable</h3>
+        <p style="color: var(--text-light); font-size: 14px;" id="stock-alert-message">
+            The following items have been removed from your cart due to insufficient stock:
+        </p>
+        <ul id="removed-items-list">
+            <!-- Removed items will be listed here -->
+        </ul>
+        <button class="btn-primary" onclick="closeStockAlert()" style="margin-top: 15px;">
+            Continue with Available Items
+        </button>
+    </div>
+
+    <header id="main-header">
+        <div class="brand">
+            <img src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=100&q=80" alt="Logo">
+            <div class="brand-info">
+                <h1>VegCart</h1>
+                <p>Fresh Delivery</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="icon-btn" onclick="openProfile()"><i class="fas fa-user"></i></div>
+        </div>
+    </header>
+
+    <!-- Search Bar Below Header -->
+    <div class="search-bar-container" id="search-bar-container">
+        <div class="search-bar" onclick="openSearch()">
+            <i class="fas fa-search"></i>
+            <span>Search vegetables, fruits...</span>
+        </div>
+    </div>
+
+    <main>
+        <!-- Account Page (Initial Setup) -->
+        <section id="account-page" class="page">
+            <div id="new-user-form" class="profile-form">
+                <h2 style="color:var(--primary); margin-bottom:15px; text-align:center;">Welcome to VegCart!</h2>
+                <p style="text-align:center; font-size:13px; color:#666; margin-bottom:20px;">कृपया ऑर्डर करने के लिए अपनी प्रोफाइल बनाएं।</p>
+                
+                <div class="form-group">
+                    <label>आपका नाम (Name) *</label>
+                    <input type="text" id="u-name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label>फोन नंबर (Phone) *</label>
+                    <input type="tel" id="u-phone" placeholder="10-digit mobile number" required pattern="[0-9]{10}">
+                </div>
+                <div class="form-group">
+                    <label>आस पास (Landmark) *</label>
+                    <input type="text" id="u-landmark" placeholder="Near Temple, School, etc." required>
+                </div>
+                <div class="form-group">
+                    <label>गाँव (Village) *</label>
+                    <select id="u-village" required>
+                        <option value="">Select your village</option>
+                        <option value="Kalyanpur">Kalyanpur</option>
+                        <option value="Ukhlina">Ukhlina</option>
+                        <option value="Alamgirpur">Alamgirpur</option>
+                        <option value="Thirot">Thirot</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="createProfile()" id="create-profile-btn">
+                    Create Profile & Continue
+                </button>
+                <p style="text-align:center; font-size:12px; color:#666; margin-top:15px;">
+                    Note: Profile must be saved to server before you can shop
+                </p>
+            </div>
+
+            <div id="existing-user-view" class="profile-view" style="display:none;">
+                <i class="fas fa-user-circle" style="font-size: 50px; color:var(--primary); margin-bottom:10px;"></i>
+                <h2 id="d-name">User Name</h2>
+                <p><i class="fas fa-phone"></i> <span id="d-phone"></span></p>
+                <p><i class="fas fa-map-marker-alt"></i> <span id="d-address"></span></p>
+                <button class="btn-primary" onclick="goToHome()">Continue Shopping</button>
+                <button class="btn-primary btn-edit" onclick="editProfile()">Edit Profile</button>
+            </div>
+        </section>
+
+        <!-- Home Page -->
+        <section id="home-page" class="page active">
+            <div class="slider-container" id="slider">
+                <!-- Slider images will be added by JavaScript -->
+            </div>
+
+            <h3 style="padding: 0 15px; margin-bottom: 15px; font-size: 18px; font-weight: 700;">Categories</h3>
+            <div class="grid-container">
+                <div class="category-card" onclick="openCategory('vegetables', 'सब्जियां')">
+                    <img src="https://images.unsplash.com/photo-1597362925123-77861d3fbac7?auto=format&fit=crop&w=200&q=80">
+                    <span>सब्जियां</span>
+                </div>
+                <div class="category-card" onclick="openCategory('fruits', 'फल')">
+                    <img src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=200&q=80">
+                    <span>फल</span>
+                </div>
+                <div class="category-card" onclick="openCategory('dairy', 'डेरी उत्पाद')">
+                    <img src="https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=200&q=80">
+                    <span>डेरी उत्पाद</span>
+                </div>
+                <div class="category-card" onclick="openCategory('grocery', 'परचून')">
+                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&q=80">
+                    <span>परचून</span>
+                </div>
+                <div class="category-card" onclick="openCategory('kitchen', 'किचन')">
+                    <img src="https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&w=200&q=80">
+                    <span>किचन</span>
+                </div>
+                <div class="category-card" onclick="openCategory('special', 'Special')">
+                    <img src="https://images.unsplash.com/photo-1564419320461-6870880221ad?auto=format&fit=crop&w=200&q=80">
+                    <span>Special</span>
+                </div>
+            </div>
+
+            <!-- Special Category Row -->
+            <div class="special-section">
+                <div class="section-title">
+                    <span>Special Items</span>
+                    <span style="font-size: 14px; color: var(--text-light);">Swipe →</span>
+                </div>
+                <div class="special-scroll" id="special-scroll">
+                    <!-- Special items will be added by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Page -->
+        <section id="category-page" class="page">
+            <div class="page-header">
+                <div class="icon-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+                <div class="page-title" id="cat-title">Category Name</div>
+            </div>
+            <div class="product-grid" id="cat-products">
+                <!-- Category products will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Review Page (Cart Page) -->
+        <section id="review-page" class="page">
+            <div class="page-header">
+                <div class="icon-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+                <div class="page-title">My Cart</div>
+            </div>
+            <div id="order-items-list" style="padding: 0 15px;">
+                <!-- Cart items will be loaded here -->
+            </div>
+            
+            <div class="cod-section">
+                <div class="cod-text">Cash on Delivery (Cash & Online Payment Accepted)</div>
+            </div>
+            
+            <div class="total-section">
+                Total: <span id="final-total">₹0</span>
+            </div>
+            <div style="padding: 20px;">
+                <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+                    <i class="fas fa-map-marker-alt"></i> Delivering to: <span id="deliver-to-address"></span>
+                </p>
+                <button class="btn-primary" onclick="placeOrder()" id="place-order-btn">
+                    Place Order <i class="fas fa-check"></i>
+                </button>
+                <p id="min-order-message" style="color: #ff4444; font-size: 12px; text-align: center; margin-top: 10px; display: none;">
+                    <i class="fas fa-exclamation-circle"></i> Minimum order amount is ₹20
+                </p>
+            </div>
+        </section>
+
+        <!-- Profile Page -->
+        <section id="profile-page" class="page">
+            <div class="page-header">
+                <div class="icon-btn" onclick="goToHome()"><i class="fas fa-arrow-left"></i></div>
+                <div class="page-title">My Profile</div>
+            </div>
+
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-info">
+                    <h2 id="profile-name">User Name</h2>
+                    <p id="profile-phone">+91 XXXXX XXXXX</p>
+                </div>
+            </div>
+
+            <!-- Dark Mode Toggle -->
+            <div class="theme-toggle">
+                <div class="theme-info">
+                    <div class="theme-icon">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <div class="theme-text">
+                        <h3>Dark Mode</h3>
+                        <p>Toggle dark/light theme</p>
+                    </div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="profile-menu">
+                <div class="menu-item" onclick="openEditProfile()">
+                    <div class="menu-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="menu-text">
+                        <h3>Edit Profile</h3>
+                        <p>Update your personal information</p>
+                    </div>
+                    <div class="menu-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="viewOrderHistory()">
+                    <div class="menu-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <div class="menu-text">
+                        <h3>Order History</h3>
+                        <p>View your past orders</p>
+                    </div>
+                    <div class="menu-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <div class="action-card">
+                    <h3>Need Help?</h3>
+                    <p>Contact our customer support for any queries or issues</p>
+                    <button class="btn-secondary" onclick="contactSupport()">Get Help</button>
+                </div>
+                <div class="action-card">
+                    <h3>About VegCart</h3>
+                    <p>Learn more about our services and policies</p>
+                    <button class="btn-secondary" onclick="openAbout()">About Us</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Edit Profile Page - BACK BUTTON REMOVED -->
+        <section id="edit-profile-page" class="page">
+            <div class="page-header">
+                <div class="page-title">Edit Profile</div>
+            </div>
+
+            <div class="profile-form" style="margin: 20px;">
+                <div class="form-group">
+                    <label>आपका नाम (Name)</label>
+                    <input type="text" id="edit-u-name" placeholder="Enter Name">
+                </div>
+                <div class="form-group">
+                    <label>फोन नंबर (Phone)</label>
+                    <input type="tel" id="edit-u-phone" placeholder="Enter Phone">
+                </div>
+                <div class="form-group">
+                    <label>आस पास (Landmark)</label>
+                    <input type="text" id="edit-u-landmark" placeholder="Near Temple, etc.">
+                </div>
+                <div class="form-group">
+                    <label>गाँव (Village)</label>
+                    <select id="edit-u-village">
+                        <option value="Kalyanpur">Kalyanpur</option>
+                        <option value="Ukhlina">Ukhlina</option>
+                        <option value="Alamgirpur">Alamgirpur</option>
+                        <option value="Pura">Pura</option>
+                        <option value="Thirot">Thirot</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="updateProfile()">Update Profile</button>
+                <button class="btn-secondary" onclick="openProfile()" style="margin-top: 10px;">Cancel</button>
+            </div>
+        </section>
+
+        <!-- Order History Page -->
+        <section id="order-history-page" class="page">
+            <div class="page-header">
+                <div class="icon-btn" onclick="openProfile()"><i class="fas fa-arrow-left"></i></div>
+                <div class="page-title">Order History</div>
+            </div>
+            <div id="order-history-list" style="padding: 15px;">
+                <!-- Order history will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Order Details Page -->
+        <section id="order-details-page" class="page">
+            <div class="page-header">
+                <div class="icon-btn" onclick="viewOrderHistory()"><i class="fas fa-arrow-left"></i></div>
+                <div class="page-title">Order Details</div>
+            </div>
+            <div id="order-details-content" style="padding: 15px;">
+                <!-- Order details will be loaded here -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Search Page -->
+    <div id="search-page" style="display: none;">
+        <div class="search-header">
+            <div class="back-btn" onclick="closeSearch()"><i class="fas fa-arrow-left"></i></div>
+            <div class="search-input-box">
+                <i class="fas fa-search" style="color:#999"></i>
+                <input type="text" id="search-input" placeholder="Search vegetables, fruits..." oninput="performSearch()">
+            </div>
+        </div>
+        
+        <div class="product-grid" id="search-results" style="padding-top: 10px;">
+            <!-- Search results will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Floating Cart - NOW CONTROLLED BY JAVASCRIPT -->
+    <div class="floating-cart" id="floating-cart" onclick="goToReview()">
+        <div class="cart-info">
+            <span id="cart-count">0</span> Items | <span id="cart-total">₹0</span>
+        </div>
+        <div class="cart-action">
+            View Cart <i class="fas fa-shopping-cart"></i>
+        </div>
+    </div>
+
+    <!-- Order Success Message -->
+    <div class="order-success" id="order-success">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h3 style="color: var(--primary); margin-bottom: 10px;">Order Confirmed!</h3>
+        <p style="color: var(--text-light); font-size: 14px;" id="order-success-message">
+            Your order has been placed successfully
+        </p>
+        <p style="color: var(--primary); font-size: 12px; margin-top: 10px;" id="order-id-display"></p>
+        <button class="btn-primary" onclick="closeOrderSuccess()" style="margin-top: 15px;">Continue Shopping</button>
+    </div>
+
+    <!-- Order Error Message -->
+    <div class="order-error" id="order-error">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <h3 style="color: #d32f2f; margin-bottom: 10px;">Order Failed!</h3>
+        <p style="color: var(--text-light); font-size: 14px;" id="error-message">
+            Please try again later
+        </p>
+        <button class="btn-primary" onclick="closeOrderError()" style="margin-top: 15px;">OK</button>
+    </div>
+
+    <!-- Quantity Modal -->
+    <div class="modal-overlay" id="qty-modal">
+        <div class="bottom-sheet">
+            <div class="sheet-header">
+                <div class="sheet-title" id="modal-p-name">Product</div>
+                <div class="sheet-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+
+            <div class="stock-info" id="modal-stock-info">
+                Stock: 0 available
+            </div>
+
+            <div class="qty-presets" id="qty-presets">
+                <!-- Quantity presets will be loaded here -->
+            </div>
+
+            <div class="slider-wrapper">
+                <div class="slider-controls">
+                    <button class="slider-btn" onclick="changeSliderValue(-1)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <input type="range" min="0" max="5000" step="50" value="500" class="range-slider" id="qty-slider">
+                    <button class="slider-btn" onclick="changeSliderValue(1)">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="live-qty" id="live-qty">500 g</div>
+                <div class="live-price" id="live-price">Price: ₹20</div>
+            </div>
+
+            <button class="btn-primary" onclick="confirmAddToCart()" id="confirm-add-btn">Add to Cart</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
